@@ -10,14 +10,16 @@ import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import Loader from "../Loader/Loader";
 import MovieModal from "../MovieModal/MovieModal";
 import type { Movie } from "../../types/movie";
+import { Toaster, toast } from "react-hot-toast";
+import { useEffect } from "react";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [topic, setTopic] = useState("");
+  const [query, setQuery] = useState("");
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["movies", topic, currentPage],
-    queryFn: () => fetchMovies(topic, currentPage),
-    enabled: topic !== "",
+    queryKey: ["movies", query, currentPage],
+    queryFn: () => fetchMovies(query, currentPage),
+    enabled: query !== "",
     placeholderData: keepPreviousData,
   });
 
@@ -29,10 +31,16 @@ export default function App() {
 
   const totalPage = data?.total_pages ?? 0;
 
-  const handelFormSubmit = (newTopic: string) => {
-    setTopic(newTopic);
+  const handelFormSubmit = (newQuery: string) => {
+    setQuery(newQuery);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (isSuccess && data && data.results.length === 0) {
+      toast.error("No movies found for your search.");
+    }
+  }, [isSuccess, data]);
 
   return (
     <>
@@ -58,6 +66,7 @@ export default function App() {
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={closeModal} />
       )}
+      <Toaster position="top-right" reverseOrder={false} />
     </>
   );
 }
