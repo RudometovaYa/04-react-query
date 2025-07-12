@@ -31,7 +31,7 @@ export default function App() {
 
   const totalPage = data?.total_pages ?? 0;
 
-  const handelFormSubmit = (newQuery: string) => {
+  const handleFormSubmit = (newQuery: string) => {
     setQuery(newQuery);
     setCurrentPage(1);
   };
@@ -44,13 +44,13 @@ export default function App() {
 
   return (
     <>
-      <SearchBar onSubmit={handelFormSubmit} />
+      <SearchBar onSubmit={handleFormSubmit} />
 
-      {isSuccess && (
+      {isSuccess && (data.results.length > 0 || totalPage > 1) && (
         <Pagination
-          page={currentPage}
-          totalPages={totalPage}
-          setPage={setCurrentPage}
+          pageCount={totalPage}
+          forcePage={currentPage}
+          onPageChange={setCurrentPage}
         />
       )}
       {isLoading && <Loader />}
